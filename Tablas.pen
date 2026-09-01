@@ -1,5 +1,5 @@
 {
-  "version": "2.14",
+  "version": "2.17",
   "children": [
     {
       "type": "frame",
@@ -9161,7 +9161,8 @@
                           "fill": "$dark-brown",
                           "content": "Notificaciones por email",
                           "fontFamily": "Congreso de Perros",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -9226,7 +9227,8 @@
                           "fill": "$dark-brown",
                           "content": "Recordatorios de cursos",
                           "fontFamily": "Congreso de Perros",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -9291,7 +9293,8 @@
                           "fill": "$dark-brown",
                           "content": "Newsletter semanal",
                           "fontFamily": "Congreso de Perros",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -9396,7 +9399,8 @@
                           "fill": "$brown",
                           "content": "Contraseña",
                           "fontFamily": "Congreso de Perros",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -9500,7 +9504,8 @@
                           "fill": "$wine",
                           "content": "Tabla de Quesos Clásica",
                           "fontFamily": "Congreso de Perros",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "frame",
@@ -9597,7 +9602,8 @@
                           "fill": "$wine",
                           "content": "Frutas Tropicales & Exóticas",
                           "fontFamily": "Congreso de Perros",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "frame",
@@ -9694,7 +9700,8 @@
                           "fill": "$wine",
                           "content": "Tabla Premium para Eventos",
                           "fontFamily": "Congreso de Perros",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "frame",
@@ -9791,7 +9798,8 @@
                           "fill": "$wine",
                           "content": "Maridaje de Vinos",
                           "fontFamily": "Congreso de Perros",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "frame",
@@ -9888,7 +9896,8 @@
                           "fill": "$wine",
                           "content": "Quesos Madurados",
                           "fontFamily": "Congreso de Perros",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "frame",
@@ -10003,7 +10012,8 @@
                       "fill": "$raspberry",
                       "content": "Eliminar cuenta",
                       "fontFamily": "Congreso de Perros",
-                      "fontSize": 20
+                      "fontSize": 20,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",

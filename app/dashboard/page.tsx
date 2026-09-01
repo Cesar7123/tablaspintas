@@ -3,5 +3,95 @@ import { courses } from "@/lib/content";
 import { CourseCard } from "@/components/molecules/CourseCard";
 
 export default function DashboardPage() {
-  return <><Navigation solid /><main className="dashboard-page"><header className="dashboard-head"><div><p className="eyebrow mustard-text">Academia Tablas Pintas</p><h1>Bienvenido/a a tu<br /><em>Academia</em></h1></div><a className="avatar" href="/perfil" aria-label="Abrir perfil">MG</a></header><section className="dashboard-library first-library"><div className="subhead"><h2>Tus cursos en progreso</h2><a href="/cursos">Ver todos →</a></div><div className="course-list">{courses.map((course, index) => <a className="course-progress-row" href={`/cursos/${course.slug}`} key={course.slug}><span className={`progress-thumb ${course.tone}`}><b>0{index + 1}</b></span><span className="course-row-copy"><strong>{course.title}</strong><small>{index === 0 ? "42% completado" : "Aún no comienzas"}</small></span><span className={`status-pill ${index === 0 ? "current" : ""}`}>{index === 0 ? "En progreso" : "Por comenzar"}</span><span className="row-arrow">→</span></a>)}</div></section><section className="dashboard-library completed"><div className="subhead"><h2>Cursos completados</h2><span className="library-note">Tu colección de certificados</span></div><div className="completed-list"><a className="completed-row" href="/cursos/tabla-de-quesos-clasica"><span className="progress-thumb orange"><b>01</b></span><span className="course-row-copy"><strong>Introducción a las tablas</strong><small>Completado el 12 de agosto</small></span><span className="certificate">Certificado →</span></a><a className="completed-row" href="/cursos/frutas-tropicales-exoticas"><span className="progress-thumb leaf"><b>02</b></span><span className="course-row-copy"><strong>Frutas de temporada</strong><small>Completado el 28 de julio</small></span><span className="certificate">Certificado →</span></a></div></section><section className="dashboard-grid"><section><div className="subhead"><h2>Más cursos disponibles</h2><a href="/cursos">Explorar catálogo →</a></div><div className="available-grid">{courses.map((course, index) => <CourseCard course={course} index={index} key={`available-${course.slug}`} />)}</div></section><aside className="next-class"><span className="eyebrow mustard-text">Próxima sesión</span><strong>Sábado, 14 de septiembre</strong><p>Tabla de Quesos Clásica<br />11:00 AM · Zoom</p><a href="#calendar">Agregar al calendario +</a></aside></section></main></>;
+  return (
+    <>
+      <Navigation solid />
+      <main className="dashboard-page">
+        <header className="dashboard-head flex flex-wrap">
+          <div className="">
+            <p className="eyebrow mustard-text">Academia Tablas Pintas</p>
+            <h1>
+              Bienvenido/a a tu
+              <br />
+              <em>Academia</em>
+            </h1>
+          </div>
+          <aside className="next-class">
+            <span className="eyebrow mustard-text">Próxima sesión</span>
+            <strong>Sábado, 14 de septiembre</strong>
+            <p>
+              Tabla de Quesos Clásica
+              <br />
+              11:00 AM · Zoom
+            </p>
+            <a href="#calendar">Agregar al calendario +</a>
+          </aside>
+        </header>
+        <section className="dashboard-library first-library">
+          <div className="subhead">
+            <h2>Tus cursos en progreso</h2>
+            <a href="/cursos">Ver todos →</a>
+          </div>
+          <div className="course-list">
+            {courses.map((course, index) => (
+              <a className="course-progress-row" href={`/cursos/${course.slug}`} key={course.slug}>
+                <span className={`progress-thumb ${course.tone}`}>
+                  <b>0{index + 1}</b>
+                </span>
+                <span className="course-row-copy">
+                  <strong>{course.title}</strong>
+                  <small>{index === 0 ? "42% completado" : "Aún no comienzas"}</small>
+                </span>
+                <span className={`status-pill ${index === 0 ? "current" : ""}`}>
+                  {index === 0 ? "En progreso" : "Por comenzar"}
+                </span>
+                <span className="row-arrow">→</span>
+              </a>
+            ))}
+          </div>
+        </section>
+        <section className="dashboard-library completed">
+          <div className="subhead">
+            <h2>Cursos completados</h2>
+            <span className="library-note">Tu colección de certificados</span>
+          </div>
+          <div className="completed-list">
+            <a className="completed-row" href="/cursos/tabla-de-quesos-clasica">
+              <span className="progress-thumb orange">
+                <b>01</b>
+              </span>
+              <span className="course-row-copy">
+                <strong>Introducción a las tablas</strong>
+                <small>Completado el 12 de agosto</small>
+              </span>
+              <span className="certificate">Certificado →</span>
+            </a>
+            <a className="completed-row" href="/cursos/frutas-tropicales-exoticas">
+              <span className="progress-thumb leaf">
+                <b>02</b>
+              </span>
+              <span className="course-row-copy">
+                <strong>Frutas de temporada</strong>
+                <small>Completado el 28 de julio</small>
+              </span>
+              <span className="certificate">Certificado →</span>
+            </a>
+          </div>
+        </section>
+        <section className="dashboard-grid">
+          <section>
+            <div className="subhead">
+              <h2>Más cursos disponibles</h2>
+              <a href="/cursos">Explorar catálogo →</a>
+            </div>
+            <div className="available-grid">
+              {courses.map((course, index) => (
+                <CourseCard course={course} index={index} key={`available-${course.slug}`} />
+              ))}
+            </div>
+          </section>
+        </section>
+      </main>
+    </>
+  );
 }

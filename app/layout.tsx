@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { cheapPotatoes, cfCrayons, congresoDePerros } from "./fonts";
+import { AuthProvider } from "@/components/auth/AuthContext";
 
 export const metadata: Metadata = {
   title: "Tablas Pintas | El arte de presentar alimentos",
@@ -8,5 +9,13 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="es"><body className={`${cheapPotatoes.variable} ${cfCrayons.variable} ${congresoDePerros.variable}`}>{children}</body></html>;
+  return (
+    <html lang="es">
+      <body
+        className={`${cheapPotatoes.variable} ${cfCrayons.variable} ${congresoDePerros.variable}`}
+      >
+        <AuthProvider>{children}</AuthProvider>
+      </body>
+    </html>
+  );
 }
