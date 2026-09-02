@@ -172,7 +172,7 @@ textarea:focus-visible {
   background: linear-gradient(90deg, #1a100bd9 0%, #1a100b8c 45%, #1a100b40 100%);
 }
 .hero-copy {
-  width: min(680px, 78%);
+  min-height: calc(100vh - 32px);
   margin-left: clamp(70px, 11vw, 160px);
   padding-top: 60px;
   animation: rise 0.7s ease-out both;
