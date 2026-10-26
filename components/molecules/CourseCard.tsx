@@ -1,4 +1,3 @@
-import { ArrowIcon } from "../atoms/ArrowIcon";
 import type { Course } from "../../lib/content";
 
 export function CourseCard({ course, index }: { course: Course; index: number }) {

@@ -1,2 +1,4 @@
 import { AuthPanel } from "@/components/organisms/AuthPanel";
-export default function RegisterPage() { return <AuthPanel register />; }
+export default function RegisterPage() {
+  return <AuthPanel register />;
+}

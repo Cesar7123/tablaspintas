@@ -1,97 +1,130 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Navigation } from "@/components/organisms/Navigation";
-import { courses } from "@/lib/content";
-import { CourseCard } from "@/components/molecules/CourseCard";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { useAuth } from "@/components/auth/AuthContext";
+import { api, Enrollment } from "@/lib/api";
 
 export default function DashboardPage() {
+  const { user, isLoading, isInitialized } = useAuth();
+  const [courses, setCourses] = useState<Enrollment[]>([]);
+  const [certificates, setCertificates] = useState(0);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    if (!isInitialized || isLoading || !user) return;
+    Promise.all([api.myCourses("limit=50"), api.certificates()])
+      .then(([enrolled, issued]) => {
+        setCourses(enrolled.courses);
+        setCertificates(issued.total);
+      })
+      .catch((err) => setError(err.message));
+  }, [isInitialized, isLoading, user]);
+  const active = courses.filter((course) => course.status === "active");
+  const completed = courses.filter((course) => course.status === "completed");
   return (
-    <>
+    <ProtectedRoute>
       <Navigation solid />
       <main className="dashboard-page">
         <header className="dashboard-head flex flex-wrap">
-          <div className="">
+          <div>
             <p className="eyebrow mustard-text">Academia Tablas Pintas</p>
             <h1>
-              Bienvenido/a a tu
-              <br />
-              <em>Academia</em>
+              Tu <em>Academia</em>
             </h1>
           </div>
           <aside className="next-class">
             <span className="eyebrow mustard-text">Próxima sesión</span>
-            <strong>Sábado, 14 de septiembre</strong>
-            <p>
-              Tabla de Quesos Clásica
-              <br />
-              11:00 AM · Zoom
-            </p>
-            <a href="#calendar">Agregar al calendario +</a>
+            {active[0] ? (
+              <>
+                <strong>
+                  {new Date(active[0].date_of_transmission).toLocaleString("es-MX", {
+                    dateStyle: "full",
+                  })}
+                </strong>
+                <p>
+                  {active[0].title}
+                  <br />
+                  {new Date(active[0].date_of_transmission).toLocaleTimeString("es-MX", {
+                    timeStyle: "short",
+                  })}
+                </p>
+                {active[0].google_meet_link && (
+                  <a href={active[0].google_meet_link} target="_blank" rel="noreferrer">
+                    Entrar a la sesión +
+                  </a>
+                )}
+              </>
+            ) : (
+              <p>No tienes sesiones próximas.</p>
+            )}
           </aside>
         </header>
+        {error && (
+          <p className="form-status" role="alert">
+            {error}
+          </p>
+        )}
         <section className="dashboard-library first-library">
           <div className="subhead">
-            <h2>Tus cursos en progreso</h2>
-            <a href="/cursos">Ver todos →</a>
+            <h2>Tus cursos</h2>
+            <a href="/cursos">Explorar catálogo →</a>
           </div>
           <div className="course-list">
-            {courses.map((course, index) => (
-              <a className="course-progress-row" href={`/cursos/${course.slug}`} key={course.slug}>
-                <span className={`progress-thumb ${course.tone}`}>
-                  <b>0{index + 1}</b>
-                </span>
-                <span className="course-row-copy">
-                  <strong>{course.title}</strong>
-                  <small>{index === 0 ? "42% completado" : "Aún no comienzas"}</small>
-                </span>
-                <span className={`status-pill ${index === 0 ? "current" : ""}`}>
-                  {index === 0 ? "En progreso" : "Por comenzar"}
-                </span>
-                <span className="row-arrow">→</span>
-              </a>
-            ))}
+            {courses.length ? (
+              courses.map((course) => (
+                <a className="course-progress-row" href={`/cursos/${course.id}`} key={course.id}>
+                  <span className="progress-thumb mustard">
+                    <b>TP</b>
+                  </span>
+                  <span className="course-row-copy">
+                    <strong>{course.title}</strong>
+                    <small>
+                      Acceso hasta {new Date(course.access_until).toLocaleDateString("es-MX")}
+                    </small>
+                  </span>
+                  <span className={`status-pill ${course.status === "active" ? "current" : ""}`}>
+                    {course.status === "completed"
+                      ? "Completado"
+                      : course.status === "expired"
+                        ? "Expirado"
+                        : "Activo"}
+                  </span>
+                  <span className="row-arrow">→</span>
+                </a>
+              ))
+            ) : (
+              <p className="form-status">Aún no tienes cursos inscritos.</p>
+            )}
           </div>
         </section>
         <section className="dashboard-library completed">
           <div className="subhead">
-            <h2>Cursos completados</h2>
-            <span className="library-note">Tu colección de certificados</span>
+            <h2>Certificados</h2>
+            <span className="library-note">{certificates} disponibles</span>
           </div>
-          <div className="completed-list">
-            <a className="completed-row" href="/cursos/tabla-de-quesos-clasica">
-              <span className="progress-thumb orange">
-                <b>01</b>
-              </span>
-              <span className="course-row-copy">
-                <strong>Introducción a las tablas</strong>
-                <small>Completado el 12 de agosto</small>
-              </span>
-              <span className="certificate">Certificado →</span>
-            </a>
-            <a className="completed-row" href="/cursos/frutas-tropicales-exoticas">
-              <span className="progress-thumb leaf">
-                <b>02</b>
-              </span>
-              <span className="course-row-copy">
-                <strong>Frutas de temporada</strong>
-                <small>Completado el 28 de julio</small>
-              </span>
-              <span className="certificate">Certificado →</span>
-            </a>
-          </div>
-        </section>
-        <section className="dashboard-grid">
-          <section>
-            <div className="subhead">
-              <h2>Más cursos disponibles</h2>
-              <a href="/cursos">Explorar catálogo →</a>
-            </div>
-            <div className="available-grid">
-              {courses.map((course, index) => (
-                <CourseCard course={course} index={index} key={`available-${course.slug}`} />
-              ))}
-            </div>
-          </section>
+          {completed.length ? (
+            completed.map((course) => (
+              <a
+                className="completed-row"
+                href="/perfil#certificados"
+                key={`completed-${course.id}`}
+              >
+                <span className="progress-thumb orange">
+                  <b>✓</b>
+                </span>
+                <span className="course-row-copy">
+                  <strong>{course.title}</strong>
+                  <small>Curso completado</small>
+                </span>
+                <span className="certificate">Ver certificado →</span>
+              </a>
+            ))
+          ) : (
+            <p className="form-status">Completa un curso para obtener certificado.</p>
+          )}
         </section>
       </main>
-    </>
+    </ProtectedRoute>
   );
 }

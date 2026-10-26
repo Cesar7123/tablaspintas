@@ -1,31 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "../auth/AuthContext";
-import { ArrowIcon } from "../atoms/ArrowIcon";
+import Link from "next/link";
+import { isAdmin, useAuth } from "../auth/AuthContext";
 import { Brand } from "../atoms/Brand";
 
 export function Navigation({ solid = false }: { solid?: boolean }) {
   const [open, setOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, isLoading, isInitialized } = useAuth();
+  const sessionReady = isInitialized && !isLoading;
   const links = solid
     ? [
-      ["Inicio", "/"],
-      ["Nosotros", "/#nosotros"],
-      ["Cursos", "/cursos"],
-      ["Contacto", "/#contacto"],
-    ]
+        ["Inicio", "/"],
+        ["Nosotros", "/#nosotros"],
+        ["Cursos", "/cursos"],
+        ["Contacto", "/#contacto"],
+      ]
     : [
-      ["Inicio", "#inicio"],
-      ["Nosotros", "#nosotros"],
-      ["Cursos", "/cursos"],
-      ["Contacto", "#contacto"],
-    ];
+        ["Inicio", "#inicio"],
+        ["Nosotros", "#nosotros"],
+        ["Cursos", "/cursos"],
+        ["Contacto", "#contacto"],
+      ];
   return (
     <nav className={`nav ${solid ? "nav-solid" : ""}`} aria-label="Navegación principal">
-      <a href="/" className="font-brand text-[22px] text-[#E57A3A]">
+      <Link href="/" className="font-brand text-[22px] text-[#E57A3A]">
         <Brand />
-      </a>
+      </Link>
       <button
         className="menu-toggle"
         aria-expanded={open}
@@ -36,24 +37,22 @@ export function Navigation({ solid = false }: { solid?: boolean }) {
       </button>
       <div id="nav-links" className={`nav-links ${open ? "open" : ""}`}>
         {links.map(([label, href]) => (
-          <a
-            key={href}
-            href={href}
-            onClick={() => setOpen(false)}
-          >
+          <Link key={href} href={href} onClick={() => setOpen(false)}>
             {label}
-          </a>
+          </Link>
         ))}
-        {user ? (
+        {!sessionReady ? null : user ? (
           <>
-            <a className="avatar" href="/perfil" aria-label="Abrir perfil">
+            {isAdmin(user) && <Link href="/admin">Admin</Link>}
+            <Link href="/dashboard">Academia</Link>
+            <Link className="avatar" href="/perfil" aria-label="Abrir perfil">
               {user.initials}
-            </a>
+            </Link>
           </>
         ) : (
-          <a className="nav-cta" href="/login">
+          <Link className="nav-cta" href="/login">
             Iniciar sesión
-          </a>
+          </Link>
         )}
       </div>
     </nav>

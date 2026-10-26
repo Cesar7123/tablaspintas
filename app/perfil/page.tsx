@@ -1,9 +1,33 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Navigation } from "@/components/organisms/Navigation";
 import { ProfileForm } from "@/components/organisms/ProfileForm";
-import { useAuth } from "../../components/auth/AuthContext";
+import { AuthUser, useAuth } from "@/components/auth/AuthContext";
+import { api, Certificate } from "@/lib/api";
+
 export default function ProfilePage() {
-  const { logout } = useAuth();
+  const { user, isLoading, isInitialized, logout } = useAuth();
+  const router = useRouter();
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    if (!isInitialized || isLoading || !user) return;
+    api
+      .certificates()
+      .then((issued) => setCertificates(issued.certificates))
+      .catch((err) => setError(err.message));
+  }, [isInitialized, isLoading, user]);
+  if (!user)
+    return (
+      <>
+        <Navigation solid />
+        <main className="account-page">
+          <p>{error || "Cargando perfil..."}</p>
+        </main>
+      </>
+    );
   return (
     <>
       <Navigation solid />
@@ -11,24 +35,30 @@ export default function ProfilePage() {
         <aside className="account-nav">
           <span className="eyebrow mustard-text">Mi espacio</span>
           <div className="profile-identity">
-            <span className="profile-avatar">MG</span>
+            <span className="profile-avatar">
+              {user.full_name
+                .split(/\s+/)
+                .map((part) => part[0])
+                .join("")
+                .slice(0, 2)}
+            </span>
             <div>
-              <strong>María González</strong>
-              <small>maria@email.com</small>
+              <strong>{user.full_name}</strong>
+              <small>{user.email}</small>
             </div>
           </div>
           <div className="profile-stats">
             <span>
-              <b>3</b>
+              <b>{user.courses_bought || 0}</b>
               <small>Cursos</small>
             </span>
             <span>
-              <b>2</b>
+              <b>{certificates.length}</b>
               <small>Certificados</small>
             </span>
             <span>
-              <b>42%</b>
-              <small>Progreso</small>
+              <b>{user.courses_completed || 0}</b>
+              <small>Completados</small>
             </span>
           </div>
           <nav>
@@ -36,7 +66,15 @@ export default function ProfilePage() {
               Perfil y ajustes
             </a>
             <a href="/dashboard">Mis cursos</a>
-            <a href="/" onClick={logout}>
+            <a
+              href="/"
+              onClick={(event) => {
+                event.preventDefault();
+                logout().then(() => {
+                  router.push("/");
+                });
+              }}
+            >
               Cerrar sesión
             </a>
           </nav>
@@ -44,57 +82,77 @@ export default function ProfilePage() {
         <section className="account-content">
           <p className="eyebrow mustard-text">Perfil y ajustes</p>
           <h2>Tu información</h2>
-          <ProfileForm />
+          <ProfileForm user={user} />
           <div className="settings-divider">
             <h3>Preferencias de correo</h3>
-            <label className="toggle-row">
-              <span>
-                <strong>Recordatorios de clase</strong>
-                <small>Recibe avisos antes de cada sesión en vivo.</small>
-              </span>
-              <input type="checkbox" defaultChecked />
-            </label>
-            <label className="toggle-row">
-              <span>
-                <strong>Novedades de Tablas Pintas</strong>
-                <small>Ideas, recetas y nuevos cursos directo en tu correo.</small>
-              </span>
-              <input type="checkbox" />
-            </label>
+            <PreferenceForm user={user} />
           </div>
-          <div className="settings-divider security-block">
-            <h3>Seguridad</h3>
-            <div className="security-row">
-              <span>
-                <strong>Contraseña</strong>
-                <small>Última actualización hace 3 meses</small>
-              </span>
-              <a href="mailto:hola@tablaspintas.mx">Cambiar contraseña →</a>
-            </div>
-          </div>
-          <div className="settings-divider certificates">
+          <div className="settings-divider certificates" id="certificados">
             <h3>Mis certificados</h3>
-            {["Introducción a las tablas", "Frutas de temporada", "Tabla de quesos clásica"].map(
-              (certificate, index) => (
-                <div className="security-row" key={certificate}>
+            {certificates.length ? (
+              certificates.map((certificate) => (
+                <div className="security-row" key={certificate.id}>
                   <span>
-                    <strong>{certificate}</strong>
-                    <small>Emitido el {12 - index * 3} de agosto, 2026</small>
+                    <strong>{certificate.course_title}</strong>
+                    <small>
+                      {certificate.certificate_code} ·{" "}
+                      {new Date(certificate.issued_at).toLocaleDateString("es-MX")}
+                    </small>
                   </span>
-                  <a href="#download">Descargar</a>
+                  <a href={certificate.pdf_url} target="_blank" rel="noreferrer">
+                    Descargar
+                  </a>
                 </div>
-              ),
+              ))
+            ) : (
+              <p>No tienes certificados disponibles.</p>
             )}
           </div>
           <div className="danger-zone">
             <h3>Zona de riesgo</h3>
-            <p>Eliminar tu cuenta borrará permanentemente tu progreso y certificados.</p>
+            <p>Solicita eliminación de cuenta al equipo de Tablas Pintas.</p>
             <a href="mailto:hola@tablaspintas.mx?subject=Eliminar%20cuenta">
               Solicitar eliminación de cuenta
             </a>
           </div>
         </section>
       </main>
+    </>
+  );
+}
+
+function PreferenceForm({ user }: { user: AuthUser }) {
+  const { setUserFromApi } = useAuth();
+  const [preferences, setPreferences] = useState(
+    user.preferences || { class_reminder: true, novelties: true, email_notifications: true },
+  );
+  const save = async (key: keyof typeof preferences, value: boolean) => {
+    const next = { ...preferences, [key]: value };
+    setPreferences(next);
+    const updated = await api.updateMe({ preferences: next });
+    setUserFromApi(updated);
+  };
+  return (
+    <>
+      {(
+        [
+          ["class_reminder", "Recordatorios de clase"],
+          ["novelties", "Novedades de Tablas Pintas"],
+          ["email_notifications", "Notificaciones por correo"],
+        ] as const
+      ).map(([key, label]) => (
+        <label className="toggle-row" key={key}>
+          <span>
+            <strong>{label}</strong>
+            <small>Gestiona los avisos que recibes.</small>
+          </span>
+          <input
+            type="checkbox"
+            checked={preferences[key]}
+            onChange={(event) => save(key, event.target.checked)}
+          />
+        </label>
+      ))}
     </>
   );
 }

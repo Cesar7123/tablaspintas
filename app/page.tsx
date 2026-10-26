@@ -1,4 +1,4 @@
-import { LandingPage } from "@/components/sections/LandingPage";
+import { ComingSoon } from "@/components/organisms/ComingSoon";
 
 export default function Home() {
   return (
@@ -6,7 +6,7 @@ export default function Home() {
       <a className="skip-link" href="#contenido">
         Ir al contenido
       </a>
-      <LandingPage />
+      <ComingSoon />
     </>
   );
 }
